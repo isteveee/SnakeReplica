@@ -34,9 +34,16 @@ public class SnakeController : MonoBehaviour {
     [SerializeField] Settings settings;
 
     void Start () {
-        overlay.SetActive(true);//TODO: Set Lang Screen
-        //welcomeText.enabled = true;
+        settings = GameObject.FindWithTag("Settings").GetComponent<Settings>(); //lost settings on reload fix
 
+        overlay.SetActive(true);//TODO: Set Lang Screen
+        
+        welcomeText.text = settings.defLangPack[0]; //separate later on for Live Changes
+        endgameText.text = settings.defLangPack[1];
+        pauseText.text =   settings.defLangPack[2];
+
+        welcomeText.enabled = true;
+        
         lastPos.Insert(0, transform.position);
         lastPos.Insert(1, transform.position);
     }
@@ -54,7 +61,7 @@ public class SnakeController : MonoBehaviour {
                     StartCoroutine(CustomUpdate());
                 }
                 else if (endgameText.enabled) {
-                    SceneManager.LoadScene("Main");
+                    SceneManager.LoadScene("Main");                    
                 }
             }
             else if (gameOn) {
@@ -117,9 +124,7 @@ public class SnakeController : MonoBehaviour {
 
         overlay.SetActive(true);
         endgameText.enabled = true;
-        endgameText.text = "GAME OVER!\n\nSCORE: " + /*TODO VAR HERE*/ "" + "\n\n<b>PRESS [SPACE] TO RESTART</b>" + "\n\n\n\n\n\n\n\n\n\n\n" +
-            "ИГРА ОКОНЧЕНА!\n\nСЧЕТ: " + "" + "\n\n<b>НАЖМИТЕ [SPACE] ДЛЯ НОВОЙ ИГРЫ</b>";
-        //TODO: vars for Lang selection
+        //endgameText.text += score;
     }
 
     void Spawn (GameObject obj) {
