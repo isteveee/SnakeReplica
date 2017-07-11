@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 public class SnakeController : MonoBehaviour {
     	
-    bool gameOn = false; //is game started?
+    bool gameOn = false;
     bool canSwitchDir = true;
     bool pause = false;
 
@@ -16,6 +16,7 @@ public class SnakeController : MonoBehaviour {
     float spawnStamp = 0f; //last food spawn time
     [SerializeField]float spawnRate = 5f; //how freq-ly spawn food
     [SerializeField]int maxFood = 2;
+    public int score = 0;
 
     Vector2 dir = new Vector2(1f, 0f); //MoveSnake direction
     public List<Vector2> foodLoc = new List<Vector2>(); //list of existing food locations
@@ -36,12 +37,8 @@ public class SnakeController : MonoBehaviour {
     void Start () {
         settings = GameObject.FindWithTag("Settings").GetComponent<Settings>(); //lost settings on reload fix
 
-        overlay.SetActive(true);//TODO: Set Lang Screen
-        
-        welcomeText.text = settings.defLangPack[0]; //separate later on for Live Changes
-        endgameText.text = settings.defLangPack[1];
-        pauseText.text =   settings.defLangPack[2];
-
+        overlay.SetActive(true);
+        SwitchLang(Settings.LANG_RU);
         welcomeText.enabled = true;
         
         lastPos.Insert(0, transform.position);
@@ -49,7 +46,6 @@ public class SnakeController : MonoBehaviour {
     }
 
     void Update () {
-
         if (Input.GetKeyDown(KeyCode.Space)) {
             if (!gameOn) {                
                 gameOn = !gameOn;
@@ -78,9 +74,14 @@ public class SnakeController : MonoBehaviour {
                 pause = !pause;
             }
         }
+
+        if (Input.GetKeyDown(KeyCode.L)) {
+            if (!gameOn && !endgameText.enabled) {
+                SwitchLang("");
+            }
+        }
         
         if (gameOn) {
-
             if (canSwitchDir) {
                 if (Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow)) {
                     if (dir != new Vector2(0f, -1f) && dir != new Vector2(0f, 1f)) {
@@ -124,7 +125,25 @@ public class SnakeController : MonoBehaviour {
 
         overlay.SetActive(true);
         endgameText.enabled = true;
-        //endgameText.text += score;
+        endgameText.text += score;
+    }
+
+    void SwitchLang (string _l) {
+        if (_l == "") {
+            if (settings.appLangPack == Settings.LANG_EN) {
+                settings.SetLangPack(Settings.LANG_RU);     
+            }
+            else if (settings.appLangPack == Settings.LANG_RU) {
+                settings.SetLangPack(Settings.LANG_EN);
+            }
+        }
+        else {
+            settings.SetLangPack(_l);
+        }
+
+        welcomeText.text = settings.defLangPack[0]; //separate later on for Live Changes
+        endgameText.text = settings.defLangPack[1];
+        pauseText.text =   settings.defLangPack[2];
     }
 
     void Spawn (GameObject obj) {
@@ -137,7 +156,6 @@ public class SnakeController : MonoBehaviour {
                 sameLocation = true;
             }
         }
-
         for (int i = 1; i < lastPos.Count; i++) {
             if (lastPos[i].x == _x && lastPos[i].y == _y) {
                 sameLocation = true;
@@ -202,11 +220,8 @@ public class SnakeController : MonoBehaviour {
 
         updRate -= (updRate * 2) / 100;
         spawnRate -= (spawnRate * 2) / 1000;
-        //if (updRate > 0.02f)
-        //    updRate -= 0.01f;
-        //else
-        //    updRate = 0.02f;
 
+        score++;
     }
     
     void CheckFood () {
